@@ -58,3 +58,28 @@ def test_observed_constant_delay_has_zero_relative_delay_and_jitter():
     assert np.allclose(o["delay_mean_ms"].dropna(), 0.0, atol=1e-6)
     assert np.allclose(o["jitter_ms"].dropna(), 0.0, atol=1e-6)
     assert o["recv_ratio"].iloc[0] == pytest.approx(1.0)
+
+
+def test_live_silence_produces_empty_windows_up_to_now():
+    """Live mode: after the last message (20 s of data), an outage must show up as windows with
+    nothing received, instead of the grid stopping at the last healthy window."""
+    data = make_data(n=40)                                   # messages for 0-20 s
+    without = observed_windows(data, window_s=5)
+    assert without["window_start"].max() == T0 + 15          # old behaviour: grid ends with the data
+    w = observed_windows(data, window_s=5, until=T0 + 45).set_index("window_start")
+    assert w.index.max() == T0 + 45
+    assert w.loc[T0 + 30, "recv_ratio"] == 0                 # silent window: nothing received
+    assert w.loc[T0 + 30, "silence_s"] == pytest.approx(35 - 19.55, abs=0.01)   # window ends at 35 s, last message at 19.55 s
+
+
+def test_live_delay_baseline_carries_over_between_slices():
+    """Live mode loads only recent data. The delay baseline (fastest transit since boot) must carry
+    over, otherwise a slice that starts during a slow period would call that slowness 'normal'."""
+    data = make_data(n=40, late={s: 2.0 for s in range(20, 40)})   # second half arrives 2 s late
+    floor = {}
+    observed_windows({**data, "messages": data["messages"][data["messages"]["seq"] < 20]}, 5, transit_floor=floor)
+    slow_only = {**data, "messages": data["messages"][data["messages"]["seq"] >= 20].reset_index(drop=True)}
+    naive = observed_windows(slow_only, 5)
+    kept = observed_windows(slow_only, 5, transit_floor=floor)
+    assert naive["delay_mean_ms"].max() == pytest.approx(0, abs=1)       # baseline lost: looks normal
+    assert kept["delay_mean_ms"].max() == pytest.approx(2000, abs=1)     # baseline kept: 2 s late

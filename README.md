@@ -2,7 +2,7 @@
 
 **AI-Driven IoT-Based Real-Time Packet Loss Pattern Analysis and Predictive Network Health Monitoring System**
 
-B.Tech CSE (AI) project. ESP32 / emulated IoT devices publish numbered telemetry over MQTT. A Python
+B.Tech AIE (Artificial Intelligence Engineering) project. ESP32 / emulated IoT devices publish numbered telemetry over MQTT. A Python
 collector stores everything in PostgreSQL, measures delivery, delay, jitter, RTT and network-layer loss,
 and a machine learning model predicts degradation 30 s ahead. A Streamlit dashboard shows device health
 and alerts.
@@ -24,7 +24,7 @@ it, how to test it, and the common mistakes.
 | netem backend (real IP-level loss, Linux/WSL2) | Written, **not yet run** | Emulated (kernel) |
 | Experiments: 20 runs + pilot | Run | Emulated (userspace proxy) |
 | ML: baselines, logistic regression, random forest (deployed), LightGBM | Implemented, evaluated | Emulated |
-| Alerts with hysteresis, live predictor | Implemented, tested | — |
+| Alerts with hysteresis, live predictor (detects full outages while they happen) | Implemented, tested end to end | — |
 | Streamlit dashboard | Implemented | — |
 | ESP32 firmware for Wokwi | Written, **not compiled in the build environment** | Simulated |
 | Physical ESP32 on real Wi-Fi | Planned | Measured |
@@ -197,4 +197,4 @@ python -m iotmon.ml.train
 - No literature review yet, so no novelty is claimed.
 
 ## Licence
-Add a licence of your choice (for example MIT) before making the repository public.
+MIT, see [`LICENSE`](LICENSE).

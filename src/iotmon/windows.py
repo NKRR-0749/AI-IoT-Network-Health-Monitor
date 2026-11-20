@@ -67,13 +67,16 @@ def _query(conn, sql, params) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ helpers
-def _grid(data: dict, window_s: int):
+def _grid(data: dict, window_s: int, until: float | None = None):
+    """Window grid covering all the data. `until` (live mode) stretches the grid up to that time,
+    so a silence after the last message still produces (empty) windows instead of nothing."""
     times = [df["ts"] for df in data.values() if len(df)]
     if not times:
         return None, 0
     allt = pd.concat(times)
     g0 = math.floor(allt.min() / window_s) * window_s
-    n = int(math.floor((allt.max() - g0) / window_s)) + 1
+    t_end = max(allt.max(), until) if until is not None else allt.max()
+    n = int(math.floor((t_end - g0) / window_s)) + 1
     return g0, n
 
 
@@ -92,10 +95,16 @@ def _replay_gaps(df: pd.DataFrame, seq_col: str) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ observed
-def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None) -> pd.DataFrame:
+def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None,
+                     until: float | None = None, transit_floor: dict | None = None) -> pd.DataFrame:
+    """until         live mode: build windows up to this time even if no data arrived (outages).
+    transit_floor  live mode: {(device_id, boot_id): smallest transit seen so far, in s}. Live mode
+                   only loads the last few minutes, so without this the delay baseline would be
+                   "fastest message in the last 10 min" instead of "fastest since boot" as in training.
+                   The dict is updated in place."""
     window_s = window_s or settings.window_s
     ontime_ms = ontime_ms or settings.ontime_ms
-    g0, n = _grid(data, window_s)
+    g0, n = _grid(data, window_s, until)
     if g0 is None:
         return pd.DataFrame()
     msgs, rtt, udp, events = data["messages"], data["rtt"], data["udp"], data["events"]
@@ -110,7 +119,13 @@ def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None) 
         if len(m):
             m = _replay_gaps(m, "seq")
             transit = m["ts"] - m["uptime_ms"] / 1000.0
-            m["rel_delay_ms"] = (transit - transit.groupby(m["boot_id"]).cummin()) * 1000.0
+            base = transit.groupby(m["boot_id"]).cummin()
+            if transit_floor is not None:
+                floor = m["boot_id"].map(lambda b: transit_floor.get((dev, int(b)), math.inf)).astype(float)
+                base = np.minimum(base, floor)
+                for b, t_min in transit.groupby(m["boot_id"]).min().items():
+                    transit_floor[(dev, int(b))] = min(transit_floor.get((dev, int(b)), math.inf), float(t_min))
+            m["rel_delay_ms"] = (transit - base) * 1000.0
             jit = Rfc3550Jitter()
             m["jitter_ms"] = [jit.update(t * 1000.0) for t in transit]
             m["iat_ms"] = m["ts"].diff() * 1000.0

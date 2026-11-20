@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 
 import joblib
 import numpy as np
+import pandas as pd
 
 from . import db
 from .alerts import AlertEngine
@@ -88,29 +89,41 @@ def live_loop() -> None:
     bundle = load_model()
     W = settings.window_s
     engines: dict = {}
-    last_scored: dict = {}
+    last_scored: dict = {}      # (run, device) -> window_start of the last window already scored
+    floors: dict = {}           # run -> {(device, boot): smallest transit seen} (delay baseline, as in training)
     print(f"[live] scoring every {W} s ...")
     while True:
         now = time.time()
         with db.connect() as conn:
-            active = [r[0] for r in conn.execute(
-                "SELECT DISTINCT run_id FROM messages WHERE received_at > now() - interval '2 minutes'")]
-            for run_id in active:
-                qos = (conn.execute("SELECT config->>'qos' FROM runs WHERE run_id=%s", (run_id,)).fetchone() or [0])[0]
-                obs = observed_windows(load_run(conn, run_id, since_epoch=now - 600), W)
+            active = conn.execute(
+                "SELECT r.run_id, r.config->>'qos', extract(epoch from r.ended_at) FROM runs r"
+                " WHERE EXISTS (SELECT 1 FROM messages m WHERE m.run_id = r.run_id"
+                " AND m.received_at > now() - interval '2 minutes')").fetchall()
+            for run_id, qos, ended in active:
+                # Build windows up to NOW, so a silence (outage) shows up as empty windows.
+                # A run that has finished is only built up to its end, so its end is not an outage.
+                until = min(now, float(ended)) if ended is not None else now
+                obs = observed_windows(load_run(conn, run_id, since_epoch=now - 600), W,
+                                       until=until, transit_floor=floors.setdefault(run_id, {}))
                 if obs.empty:
                     continue
                 feats = make_features(obs, int(qos or 0))
-                feats = feats[feats["window_start"] + W <= now - 1]           # complete windows only
-                latest = feats.sort_values("window_start").groupby("device_id").tail(1).reset_index(drop=True)
-                scores = score_rows(bundle, latest)
+                feats = feats[feats["window_start"] + W <= until - 1]          # complete windows only
+                feats = feats.sort_values("window_start").reset_index(drop=True)
+                # Score EVERY complete window not scored yet (not just the newest), so no window is
+                # skipped when a loop runs late. A device seen for the first time starts at its newest window.
+                todo = []
+                for dev, d in feats.groupby("device_id"):
+                    last = last_scored.get((run_id, dev))
+                    todo.append(d.tail(1) if last is None else d[d["window_start"] > last])
+                todo = pd.concat(todo).sort_values("window_start").reset_index(drop=True) if todo else feats.iloc[0:0]
+                if todo.empty:
+                    continue
+                scores = score_rows(bundle, todo)
                 eng = engines.setdefault(run_id, AlertEngine(model_threshold=bundle["threshold"] if bundle else 0.5))
                 events = []
-                for i, r in latest.iterrows():
-                    key = (run_id, r["device_id"])
-                    if last_scored.get(key) == r["window_start"]:
-                        continue
-                    last_scored[key] = r["window_start"]
+                for i, r in todo.iterrows():
+                    last_scored[(run_id, r["device_id"])] = r["window_start"]
                     at = float(r["window_start"]) + W
                     ev = eng.update_rule(r["device_id"], at, r["recv_ratio_now"], r["delay_p95_ms_now"])
                     events += [ev] if ev else []
