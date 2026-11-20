@@ -1,0 +1,78 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: burst_loss
+  duration_s: 33.95596224250008
+  params:
+    loss_pct: 30
+    burst_len: 20
+- name: clean
+  duration_s: 37.81267368438019
+  params: {}
+- name: outage_drop
+  duration_s: 5
+  params:
+    outage: drop
+- name: clean
+  duration_s: 29.608436802924263
+  params: {}
+- name: outage_drop
+  duration_s: 15
+  params:
+    outage: drop
+- name: clean
+  duration_s: 34.15631092736749
+  params: {}
+- name: burst_loss
+  duration_s: 38.57471619167518
+  params:
+    loss_pct: 30
+    burst_len: 20
+- name: clean
+  duration_s: 32.990225271318714
+  params: {}
+- name: burst_loss
+  duration_s: 36.03801098220791
+  params:
+    loss_pct: 20
+    burst_len: 20
+- name: clean
+  duration_s: 23.20123230757935
+  params: {}
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 133
+    jitter_ms: 33
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 267
+    jitter_ms: 67
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 400
+    jitter_ms: 100
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 533
+    jitter_ms: 133
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 667
+    jitter_ms: 167
+- name: ramp_delay
+  duration_s: 8.211457720094511
+  params:
+    delay_ms: 800
+    jitter_ms: 200
+- name: clean
+  duration_s: 24.594047481067026
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}

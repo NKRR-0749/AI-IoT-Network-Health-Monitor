@@ -1,0 +1,525 @@
+{
+  "generated": "2026-11-20 06:11",
+  "label": "EMULATED (userspace impairment proxy); not real-hardware results",
+  "task": "y_degraded: on-time delivery ratio over next 30s < 0.9 (on time = relative delay <= 1000 ms)",
+  "runs_mixed": [
+    "mix-s01-q0",
+    "mix-s01-q1",
+    "mix-s02-q0",
+    "mix-s02-q1",
+    "mix-s03-q0",
+    "mix-s03-q1",
+    "mix-s04-q0",
+    "mix-s04-q1",
+    "mix-s05-q0",
+    "mix-s05-q1",
+    "mix-s06-q0",
+    "mix-s06-q1",
+    "mix-s07-q0",
+    "mix-s07-q1",
+    "mix-s08-q0",
+    "mix-s08-q1"
+  ],
+  "runs_burst_heldout": [
+    "bur-s101-q0",
+    "bur-s101-q1",
+    "bur-s102-q0",
+    "bur-s102-q1"
+  ],
+  "crossval_mixed_all_features": {
+    "persistence": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.245,
+      "roc_auc": 0.603,
+      "precision": 0.362,
+      "recall": 0.228,
+      "f1": 0.279,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11865,
+          602
+        ],
+        [
+          1157,
+          341
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 73,
+      "early_warning_rate": 0.2,
+      "median_lead_time_s": 25.0,
+      "false_alarm_windows_per_device_hour": 31.0
+    },
+    "threshold_rule": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.161,
+      "roc_auc": 0.598,
+      "precision": 0.309,
+      "recall": 0.268,
+      "f1": 0.287,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11570,
+          897
+        ],
+        [
+          1097,
+          401
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 130,
+      "early_warning_rate": 0.356,
+      "median_lead_time_s": 25.0,
+      "false_alarm_windows_per_device_hour": 46.2
+    },
+    "logreg": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.257,
+      "roc_auc": 0.67,
+      "precision": 0.294,
+      "recall": 0.342,
+      "f1": 0.316,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11238,
+          1229
+        ],
+        [
+          986,
+          512
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 169,
+      "early_warning_rate": 0.463,
+      "median_lead_time_s": 20.0,
+      "false_alarm_windows_per_device_hour": 63.4
+    },
+    "random_forest": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.363,
+      "roc_auc": 0.675,
+      "precision": 0.33,
+      "recall": 0.294,
+      "f1": 0.311,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11570,
+          897
+        ],
+        [
+          1057,
+          441
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 119,
+      "early_warning_rate": 0.326,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 46.2
+    },
+    "lightgbm": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.278,
+      "roc_auc": 0.655,
+      "precision": 0.256,
+      "recall": 0.325,
+      "f1": 0.286,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11050,
+          1417
+        ],
+        [
+          1011,
+          487
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 157,
+      "early_warning_rate": 0.43,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 73.1
+    }
+  },
+  "crossval_mixed_app_features_only": {
+    "persistence": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.245,
+      "roc_auc": 0.603,
+      "precision": 0.362,
+      "recall": 0.228,
+      "f1": 0.279,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11865,
+          602
+        ],
+        [
+          1157,
+          341
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 73,
+      "early_warning_rate": 0.2,
+      "median_lead_time_s": 25.0,
+      "false_alarm_windows_per_device_hour": 31.0
+    },
+    "threshold_rule": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.161,
+      "roc_auc": 0.598,
+      "precision": 0.309,
+      "recall": 0.268,
+      "f1": 0.287,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11570,
+          897
+        ],
+        [
+          1097,
+          401
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 130,
+      "early_warning_rate": 0.356,
+      "median_lead_time_s": 25.0,
+      "false_alarm_windows_per_device_hour": 46.2
+    },
+    "logreg": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.257,
+      "roc_auc": 0.669,
+      "precision": 0.265,
+      "recall": 0.394,
+      "f1": 0.317,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          10828,
+          1639
+        ],
+        [
+          908,
+          590
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 204,
+      "early_warning_rate": 0.559,
+      "median_lead_time_s": 20.0,
+      "false_alarm_windows_per_device_hour": 84.5
+    },
+    "random_forest": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.369,
+      "roc_auc": 0.676,
+      "precision": 0.34,
+      "recall": 0.289,
+      "f1": 0.312,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          11626,
+          841
+        ],
+        [
+          1065,
+          433
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 114,
+      "early_warning_rate": 0.312,
+      "median_lead_time_s": 27.5,
+      "false_alarm_windows_per_device_hour": 43.4
+    },
+    "lightgbm": {
+      "n": 13965,
+      "positives": 1498,
+      "prevalence": 0.107,
+      "pr_auc": 0.271,
+      "roc_auc": 0.658,
+      "precision": 0.234,
+      "recall": 0.312,
+      "f1": 0.268,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          10936,
+          1531
+        ],
+        [
+          1030,
+          468
+        ]
+      ],
+      "onsets": 365,
+      "onsets_warned_early": 145,
+      "early_warning_rate": 0.397,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 78.9
+    }
+  },
+  "heldout_burst_trained_on_mixed": {
+    "persistence": {
+      "n": 3240,
+      "positives": 1351,
+      "prevalence": 0.417,
+      "pr_auc": 0.482,
+      "roc_auc": 0.575,
+      "precision": 0.585,
+      "recall": 0.33,
+      "f1": 0.422,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          1572,
+          317
+        ],
+        [
+          905,
+          446
+        ]
+      ],
+      "onsets": 201,
+      "onsets_warned_early": 68,
+      "early_warning_rate": 0.338,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 70.4,
+      "threshold": 0.2
+    },
+    "threshold_rule": {
+      "n": 3240,
+      "positives": 1351,
+      "prevalence": 0.417,
+      "pr_auc": 0.47,
+      "roc_auc": 0.579,
+      "precision": 0.577,
+      "recall": 0.331,
+      "f1": 0.421,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          1561,
+          328
+        ],
+        [
+          904,
+          447
+        ]
+      ],
+      "onsets": 201,
+      "onsets_warned_early": 70,
+      "early_warning_rate": 0.348,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 72.9,
+      "threshold": 0.5
+    },
+    "logreg": {
+      "n": 3240,
+      "positives": 1351,
+      "prevalence": 0.417,
+      "pr_auc": 0.539,
+      "roc_auc": 0.63,
+      "precision": 0.577,
+      "recall": 0.213,
+      "f1": 0.311,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          1678,
+          211
+        ],
+        [
+          1063,
+          288
+        ]
+      ],
+      "onsets": 201,
+      "onsets_warned_early": 62,
+      "early_warning_rate": 0.308,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 46.9,
+      "threshold": 0.7105
+    },
+    "random_forest": {
+      "n": 3240,
+      "positives": 1351,
+      "prevalence": 0.417,
+      "pr_auc": 0.543,
+      "roc_auc": 0.633,
+      "precision": 0.685,
+      "recall": 0.11,
+      "f1": 0.189,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          1821,
+          68
+        ],
+        [
+          1203,
+          148
+        ]
+      ],
+      "onsets": 201,
+      "onsets_warned_early": 27,
+      "early_warning_rate": 0.134,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 15.1,
+      "threshold": 0.5297
+    },
+    "lightgbm": {
+      "n": 3240,
+      "positives": 1351,
+      "prevalence": 0.417,
+      "pr_auc": 0.528,
+      "roc_auc": 0.638,
+      "precision": 0.634,
+      "recall": 0.128,
+      "f1": 0.213,
+      "confusion_matrix [[tn, fp], [fn, tp]]": [
+        [
+          1789,
+          100
+        ],
+        [
+          1178,
+          173
+        ]
+      ],
+      "onsets": 201,
+      "onsets_warned_early": 37,
+      "early_warning_rate": 0.184,
+      "median_lead_time_s": 30.0,
+      "false_alarm_windows_per_device_hour": 22.2,
+      "threshold": 0.2627
+    }
+  },
+  "by_qos_crossval_pr_auc": {
+    "qos0": {
+      "persistence": {
+        "prevalence": 0.103,
+        "pr_auc": 0.259
+      },
+      "threshold_rule": {
+        "prevalence": 0.103,
+        "pr_auc": 0.163
+      },
+      "logreg": {
+        "prevalence": 0.103,
+        "pr_auc": 0.248
+      },
+      "random_forest": {
+        "prevalence": 0.103,
+        "pr_auc": 0.39
+      },
+      "lightgbm": {
+        "prevalence": 0.103,
+        "pr_auc": 0.303
+      }
+    },
+    "qos1": {
+      "persistence": {
+        "prevalence": 0.111,
+        "pr_auc": 0.233
+      },
+      "threshold_rule": {
+        "prevalence": 0.111,
+        "pr_auc": 0.16
+      },
+      "logreg": {
+        "prevalence": 0.111,
+        "pr_auc": 0.268
+      },
+      "random_forest": {
+        "prevalence": 0.111,
+        "pr_auc": 0.34
+      },
+      "lightgbm": {
+        "prevalence": 0.111,
+        "pr_auc": 0.257
+      }
+    }
+  },
+  "permutation_importance_top15": [
+    [
+      "silence_s_now",
+      0.011
+    ],
+    [
+      "loss_revealed_mean6",
+      0.0083
+    ],
+    [
+      "connected_mean6",
+      0.0073
+    ],
+    [
+      "loss_revealed_max6",
+      0.0071
+    ],
+    [
+      "frac_over_ontime_max6",
+      0.0059
+    ],
+    [
+      "jitter_ms_max6",
+      0.0054
+    ],
+    [
+      "online_events_mean6",
+      0.0053
+    ],
+    [
+      "recv_ratio_slope6",
+      0.0044
+    ],
+    [
+      "jitter_ms_slope6",
+      0.0041
+    ],
+    [
+      "secs_since_offline",
+      0.003
+    ],
+    [
+      "connected_min6",
+      0.0029
+    ],
+    [
+      "udp_recv_ratio_mean6",
+      0.0026
+    ],
+    [
+      "jitter_ms_mean6",
+      0.0022
+    ],
+    [
+      "connected_now",
+      0.002
+    ],
+    [
+      "rtt_p95_ms_slope6",
+      0.0019
+    ]
+  ],
+  "final_model": "random_forest",
+  "final_model_threshold": 0.6704493140797767
+}

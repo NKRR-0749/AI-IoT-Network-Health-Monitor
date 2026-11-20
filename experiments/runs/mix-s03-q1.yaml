@@ -1,0 +1,70 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: random_loss
+  duration_s: 38.605730632398796
+  params:
+    loss_pct: 30
+- name: clean
+  duration_s: 29.24887916370198
+  params: {}
+- name: outage_drop
+  duration_s: 15
+  params:
+    outage: drop
+- name: clean
+  duration_s: 35.64300760270135
+  params: {}
+- name: random_loss
+  duration_s: 25.329199788871854
+  params:
+    loss_pct: 30
+- name: clean
+  duration_s: 40.9367270524115
+  params: {}
+- name: delay
+  duration_s: 29.793602599882487
+  params:
+    delay_ms: 300
+    jitter_ms: 75
+- name: clean
+  duration_s: 37.92870098171076
+  params: {}
+- name: outage_drop
+  duration_s: 30
+  params:
+    outage: drop
+- name: clean
+  duration_s: 31.908830217483374
+  params: {}
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 5.0
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 10.0
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 15.0
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 20.0
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 25.0
+- name: ramp_loss
+  duration_s: 11.444088433701289
+  params:
+    loss_pct: 30.0
+- name: clean
+  duration_s: 25.79805013441679
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}

@@ -1,0 +1,127 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 133
+    jitter_ms: 33
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 267
+    jitter_ms: 67
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 400
+    jitter_ms: 100
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 533
+    jitter_ms: 133
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 667
+    jitter_ms: 167
+- name: ramp_delay
+  duration_s: 10.295280451236785
+  params:
+    delay_ms: 800
+    jitter_ms: 200
+- name: clean
+  duration_s: 22.01423978154261
+  params: {}
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 133
+    jitter_ms: 33
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 267
+    jitter_ms: 67
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 400
+    jitter_ms: 100
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 533
+    jitter_ms: 133
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 667
+    jitter_ms: 167
+- name: ramp_delay
+  duration_s: 9.046485931778632
+  params:
+    delay_ms: 800
+    jitter_ms: 200
+- name: clean
+  duration_s: 20.011292872126774
+  params: {}
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 5.0
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 10.0
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 15.0
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 20.0
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 25.0
+- name: ramp_loss
+  duration_s: 10.34593768329186
+  params:
+    loss_pct: 30.0
+- name: clean
+  duration_s: 44.13794431085337
+  params: {}
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 5.0
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 10.0
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 15.0
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 20.0
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 25.0
+- name: ramp_loss
+  duration_s: 9.492641488295366
+  params:
+    loss_pct: 30.0
+- name: clean
+  duration_s: 39.253495898449756
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}

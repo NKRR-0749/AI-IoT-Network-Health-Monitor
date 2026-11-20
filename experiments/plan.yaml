@@ -1,0 +1,29 @@
+# Experiment plan used for the results in results/.
+# 16 'mixed' runs (8 seeds x QoS 0/1) for training/testing,
+# 4 'burst' runs held out for the unseen-condition test (RQ3).
+# Each run: 10 emulated devices, one message every 0.5 s, ~7 minutes.
+common:
+  devices: 10
+  interval_s: 0.5
+  duration_s: 420
+runs:
+  - {run_id: mix-s01-q0, profile: mixed, seed: 1, qos: 0}
+  - {run_id: mix-s01-q1, profile: mixed, seed: 1, qos: 1}
+  - {run_id: mix-s02-q0, profile: mixed, seed: 2, qos: 0}
+  - {run_id: mix-s02-q1, profile: mixed, seed: 2, qos: 1}
+  - {run_id: mix-s03-q0, profile: mixed, seed: 3, qos: 0}
+  - {run_id: mix-s03-q1, profile: mixed, seed: 3, qos: 1}
+  - {run_id: mix-s04-q0, profile: mixed, seed: 4, qos: 0}
+  - {run_id: mix-s04-q1, profile: mixed, seed: 4, qos: 1}
+  - {run_id: mix-s05-q0, profile: mixed, seed: 5, qos: 0}
+  - {run_id: mix-s05-q1, profile: mixed, seed: 5, qos: 1}
+  - {run_id: mix-s06-q0, profile: mixed, seed: 6, qos: 0}
+  - {run_id: mix-s06-q1, profile: mixed, seed: 6, qos: 1}
+  - {run_id: mix-s07-q0, profile: mixed, seed: 7, qos: 0}
+  - {run_id: mix-s07-q1, profile: mixed, seed: 7, qos: 1}
+  - {run_id: mix-s08-q0, profile: mixed, seed: 8, qos: 0}
+  - {run_id: mix-s08-q1, profile: mixed, seed: 8, qos: 1}
+  - {run_id: bur-s101-q0, profile: burst, seed: 101, qos: 0}
+  - {run_id: bur-s101-q1, profile: burst, seed: 101, qos: 1}
+  - {run_id: bur-s102-q0, profile: burst, seed: 102, qos: 0}
+  - {run_id: bur-s102-q1, profile: burst, seed: 102, qos: 1}

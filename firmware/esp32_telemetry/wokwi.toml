@@ -1,0 +1,12 @@
+# For Wokwi for VS Code. Build the sketch first (Arduino IDE / arduino-cli "Export compiled binary"),
+# then point these paths at the produced files.
+[wokwi]
+version = 1
+firmware = "build/esp32.esp32.esp32/esp32_telemetry.ino.bin"
+elf = "build/esp32.esp32.esp32/esp32_telemetry.ino.elf"
+
+# Private IoT gateway: lets the simulated board reach services on your laptop
+# as "host.wokwi.internal" (e.g. Mosquitto on port 1883). Check Wokwi's docs
+# for whether your plan includes it.
+[net]
+gateway = "private"

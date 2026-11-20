@@ -1,0 +1,2 @@
+# Wokwi library manager (web simulator): one library per line
+PubSubClient

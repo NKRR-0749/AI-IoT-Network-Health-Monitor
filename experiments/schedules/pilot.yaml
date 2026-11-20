@@ -1,0 +1,10 @@
+# Pilot run: one phase of each kind, used to check that the testbed does what it claims
+# (injected UDP loss ~= measured UDP loss, outages cause disconnects, delay shows in RTT).
+phases:
+  - {name: clean,        duration_s: 30, params: {}}
+  - {name: random_loss,  duration_s: 40, params: {loss_pct: 10}}
+  - {name: clean,        duration_s: 20, params: {}}
+  - {name: delay,        duration_s: 30, params: {delay_ms: 300, jitter_ms: 75}}
+  - {name: clean,        duration_s: 20, params: {}}
+  - {name: outage_drop,  duration_s: 15, params: {outage: drop}}
+  - {name: clean,        duration_s: 30, params: {}}

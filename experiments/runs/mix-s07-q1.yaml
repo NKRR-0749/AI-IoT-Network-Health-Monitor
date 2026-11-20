@@ -1,0 +1,103 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: delay
+  duration_s: 34.87058741057934
+  params:
+    delay_ms: 300
+    jitter_ms: 75
+- name: clean
+  duration_s: 21.20716059067031
+  params: {}
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 133
+    jitter_ms: 33
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 267
+    jitter_ms: 67
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 400
+    jitter_ms: 100
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 533
+    jitter_ms: 133
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 667
+    jitter_ms: 167
+- name: ramp_delay
+  duration_s: 10.143528017226757
+  params:
+    delay_ms: 800
+    jitter_ms: 200
+- name: clean
+  duration_s: 29.14222292281464
+  params: {}
+- name: random_loss
+  duration_s: 30.367454520891542
+  params:
+    loss_pct: 30
+- name: clean
+  duration_s: 22.148680842229293
+  params: {}
+- name: outage_stall
+  duration_s: 3
+  params:
+    outage: stall
+- name: clean
+  duration_s: 26.016575003175625
+  params: {}
+- name: outage_drop
+  duration_s: 15
+  params:
+    outage: drop
+- name: clean
+  duration_s: 21.47776265197473
+  params: {}
+- name: outage_drop
+  duration_s: 5
+  params:
+    outage: drop
+- name: clean
+  duration_s: 43.68624251768719
+  params: {}
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 5.0
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 10.0
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 15.0
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 20.0
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 25.0
+- name: ramp_loss
+  duration_s: 10.509732889622358
+  params:
+    loss_pct: 30.0
+- name: clean
+  duration_s: 43.69272356142514
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}

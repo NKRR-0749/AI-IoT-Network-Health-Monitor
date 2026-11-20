@@ -1,0 +1,52 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: random_loss
+  duration_s: 27.579150855767896
+  params:
+    loss_pct: 10
+- name: clean
+  duration_s: 29.901456065267027
+  params: {}
+- name: random_loss
+  duration_s: 26.66287739198975
+  params:
+    loss_pct: 1
+- name: clean
+  duration_s: 30.03977536212687
+  params: {}
+- name: delay
+  duration_s: 30.54820439225794
+  params:
+    delay_ms: 100
+    jitter_ms: 25
+- name: clean
+  duration_s: 33.41700020437034
+  params: {}
+- name: delay
+  duration_s: 45.671791975606844
+  params:
+    delay_ms: 300
+    jitter_ms: 75
+- name: clean
+  duration_s: 26.542989465296348
+  params: {}
+- name: random_loss
+  duration_s: 45.01119596357415
+  params:
+    loss_pct: 10
+- name: clean
+  duration_s: 24.835890450481003
+  params: {}
+- name: delay
+  duration_s: 40.67439006032825
+  params:
+    delay_ms: 600
+    jitter_ms: 150
+- name: clean
+  duration_s: 38.29736772196795
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}
