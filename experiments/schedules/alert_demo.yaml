@@ -1,0 +1,9 @@
+# Demo: faults strong enough to trigger rule and model alerts
+phases:
+  - {name: clean,        duration_s: 40, params: {}}
+  - {name: random_loss,  duration_s: 60, params: {loss_pct: 30}}
+  - {name: clean,        duration_s: 30, params: {}}
+  - {name: delay,        duration_s: 50, params: {delay_ms: 1500, jitter_ms: 300}}
+  - {name: clean,        duration_s: 30, params: {}}
+  - {name: outage_drop,  duration_s: 25, params: {outage: drop}}
+  - {name: clean,        duration_s: 40, params: {}}

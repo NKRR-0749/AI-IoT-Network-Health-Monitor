@@ -1,0 +1,26 @@
+phases:
+- name: clean
+  duration_s: 40.0
+  params: {}
+- name: random_loss
+  duration_s: 60.0
+  params:
+    loss_pct: 30
+- name: clean
+  duration_s: 30.0
+  params: {}
+- name: delay
+  duration_s: 50.0
+  params:
+    delay_ms: 1500
+    jitter_ms: 300
+- name: clean
+  duration_s: 30.0
+  params: {}
+- name: outage_drop
+  duration_s: 25.0
+  params:
+    outage: drop
+- name: clean
+  duration_s: 40.0
+  params: {}
