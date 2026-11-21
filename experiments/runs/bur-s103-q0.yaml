@@ -1,0 +1,120 @@
+phases:
+- name: clean
+  duration_s: 45
+  params: {}
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 5.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 10.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 15.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 20.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 25.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 9.825193105167394
+  params:
+    loss_pct: 30.0
+    burst_len: 10
+- name: clean
+  duration_s: 37.97117585250591
+  params: {}
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 5.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 10.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 15.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 20.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 25.0
+    burst_len: 10
+- name: ramp_loss
+  duration_s: 11.27304447337692
+  params:
+    loss_pct: 30.0
+    burst_len: 10
+- name: clean
+  duration_s: 37.22712555491141
+  params: {}
+- name: outage_drop
+  duration_s: 30
+  params:
+    outage: drop
+- name: clean
+  duration_s: 23.047987568067057
+  params: {}
+- name: outage_stall
+  duration_s: 6
+  params:
+    outage: stall
+- name: clean
+  duration_s: 42.24257054517609
+  params: {}
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 133
+    jitter_ms: 33
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 267
+    jitter_ms: 67
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 400
+    jitter_ms: 100
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 533
+    jitter_ms: 133
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 667
+    jitter_ms: 167
+- name: ramp_delay
+  duration_s: 10.70117113347915
+  params:
+    delay_ms: 800
+    jitter_ms: 200
+- name: clean
+  duration_s: 32.2277511436928
+  params: {}
+- name: clean
+  duration_s: 30
+  params: {}

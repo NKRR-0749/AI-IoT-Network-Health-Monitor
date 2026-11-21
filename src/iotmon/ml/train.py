@@ -98,13 +98,15 @@ def oof_scores(name, X, y, groups, n_splits=3) -> np.ndarray:
 
 
 # ------------------------------------------------------------------ evaluation
-def event_metrics(df: pd.DataFrame, pred: np.ndarray, window_s: int, horizon_s: int) -> dict:
-    """Early warning: for each degradation ONSET, was there an alarm in the horizon before it?"""
+def event_metrics(df: pd.DataFrame, pred: np.ndarray, window_s: int, horizon_s: int,
+                  onset_log: list | None = None) -> dict:
+    """Early warning: for each degradation ONSET, was there an alarm in the horizon before it?
+    onset_log (optional) collects one record per onset: (run_id, device_id, onset time, warned, lead s)."""
     d = df[["run_id", "device_id", "window_start", "target_otdr", "target_next_otdr"]].copy()
     d["pred"] = pred
     caught, leads, onsets = 0, [], 0
     false_alarms, hours = 0, 0.0
-    for _, g in d.sort_values("window_start").groupby(["run_id", "device_id"]):
+    for (rid, dev), g in d.sort_values("window_start").groupby(["run_id", "device_id"]):
         ws = g["window_start"].to_numpy()
         # state of the single window right after each row (the first window of its horizon)
         now_bad = g["target_next_otdr"].fillna(1).to_numpy() < 0.9
@@ -120,6 +122,9 @@ def event_metrics(df: pd.DataFrame, pred: np.ndarray, window_s: int, horizon_s: 
                 if len(early):
                     caught += 1
                     leads.append(float(t_on - ws[early[0]]))
+                if onset_log is not None:
+                    onset_log.append((rid, dev, float(t_on), bool(len(early)),
+                                      float(t_on - ws[early[0]]) if len(early) else None))
     return {"onsets": onsets, "onsets_warned_early": caught,
             "early_warning_rate": round(caught / onsets, 3) if onsets else None,
             "median_lead_time_s": float(np.median(leads)) if leads else None,
@@ -172,7 +177,45 @@ def crossval(df, feats, window_s, horizon_s, n_splits=4):
             oof[m][te] = scores[m]
             oof_bin[m][te] = (scores[m] >= res[m]["threshold"]).astype(int)
     y = df[TARGET].to_numpy()
-    return {m: score_block(df, y, oof[m], oof_bin[m], window_s, horizon_s) for m in oof}, oof
+    return {m: score_block(df, y, oof[m], oof_bin[m], window_s, horizon_s) for m in oof}, oof, oof_bin
+
+
+# ------------------------------------------------------------------ onset kinds (gradual vs sudden)
+def onset_kind(phases: pd.DataFrame, t_bad: float, window_s: int) -> str:
+    """What the fault injector was doing in the first bad window [t_bad, t_bad + window_s): 'gradual'
+    for ramp phases, otherwise the sudden phase kind. If only clean overlaps it, the last fault that
+    ended in the 10 s before (TCP keeps suffering for a moment after a fault is removed)."""
+    cur = phases[(phases["start"] < t_bad + window_s) & (phases["end"] > t_bad) & (phases["phase"] != "clean")]
+    if len(cur):
+        name = cur.iloc[0]["phase"]
+    else:
+        prev = phases[(phases["phase"] != "clean") & (phases["end"] <= t_bad) & (phases["end"] > t_bad - 10)]
+        if not len(prev):
+            return "other"
+        name = prev.iloc[-1]["phase"]
+    if name.startswith("ramp_"):
+        return "gradual (ramp)"
+    return {"random_loss": "sudden loss", "burst_loss": "sudden loss", "delay": "sudden delay",
+            "outage_stall": "sudden stall", "outage_drop": "sudden outage"}.get(name, "other")
+
+
+def onsets_by_kind(df, oof_bin: dict, window_s: int, horizon_s: int) -> dict:
+    with db.connect() as conn:
+        rows = conn.execute("SELECT run_id, phase, extract(epoch from start_at), extract(epoch from end_at)"
+                            " FROM impairments WHERE end_at IS NOT NULL ORDER BY start_at").fetchall()
+    ph = pd.DataFrame(rows, columns=["run_id", "phase", "start", "end"]).astype({"start": float, "end": float})
+    by_run = {r: g.reset_index(drop=True) for r, g in ph.groupby("run_id")}
+    out = {}
+    for m, b in oof_bin.items():
+        log: list = []
+        event_metrics(df, b, window_s, horizon_s, onset_log=log)
+        rec = pd.DataFrame(log, columns=["run_id", "device_id", "t_on", "warned", "lead"])
+        # the onset row's horizon starts one window later: that window is the first bad one
+        rec["kind"] = [onset_kind(by_run.get(r, ph.iloc[0:0]), t + window_s, window_s) for r, t in zip(rec["run_id"], rec["t_on"])]
+        for k, g in rec.groupby("kind"):
+            out.setdefault(k, {})[m] = {"onsets": int(len(g)), "early_warning_rate": round(float(g["warned"].mean()), 3),
+                                        "median_lead_time_s": float(g["lead"].median()) if g["warned"].any() else None}
+    return out
 
 
 def by_qos(df, oof, bins_from, window_s, horizon_s) -> dict:
@@ -214,9 +257,10 @@ def main():
     feats_app = feature_columns(df, with_probe=False)
     print(f"[train] mixed rows={len(mixed)} burst rows={len(burst)} features={len(feats)}")
 
-    cv, oof = crossval(mixed, feats, window_s, horizon_s)
+    cv, oof, oof_bin = crossval(mixed, feats, window_s, horizon_s)
     print("[train] cross-validation done")
-    cv_app, _ = crossval(mixed, feats_app, window_s, horizon_s)
+    cv_app, _, _ = crossval(mixed, feats_app, window_s, horizon_s)
+    by_kind = onsets_by_kind(mixed, oof_bin, window_s, horizon_s)
     heldout, _ = evaluate(mixed, burst, feats, window_s, horizon_s) if len(burst) else ({}, {})
     print("[train] held-out burst test done")
 
@@ -247,6 +291,7 @@ def main():
         "crossval_mixed_app_features_only": cv_app,
         "heldout_burst_trained_on_mixed": heldout,
         "by_qos_crossval_pr_auc": by_qos(mixed, oof, list(oof), window_s, horizon_s),
+        "early_warning_by_onset_kind_crossval": by_kind,
         "permutation_importance_top15": [[f, round(float(v), 4)] for f, v in importance],
         "final_model": best,
         "final_model_threshold": thr,
@@ -266,6 +311,17 @@ def main():
         md.append(f"| {m} | " + " | ".join(f"{results['by_qos_crossval_pr_auc'][q][m]['pr_auc']} "
                                            f"(prev. {results['by_qos_crossval_pr_auc'][q][m]['prevalence']})"
                                            for q in results["by_qos_crossval_pr_auc"]) + " |")
+    md += ["", "### Early warning by onset kind (cross-validation): can it see a degradation coming?", "",
+           "Each degradation onset is tagged with what the fault injector was doing when it started. "
+           "Gradual (ramp) degradations build up over about a minute; sudden ones switch on at once.", "",
+           "| Onset kind | onsets | " + " | ".join(oof) + " |", "|---|---|" + "---|" * len(oof)]
+    for k in sorted(by_kind, key=lambda k: (k != "gradual (ramp)", k)):
+        n = next(iter(by_kind[k].values()))["onsets"]
+        md.append(f"| {k} | {n} | " + " | ".join(
+            f"{by_kind[k][m]['early_warning_rate']}" + (f" ({by_kind[k][m]['median_lead_time_s']:.0f} s)"
+                                                         if by_kind[k][m]['median_lead_time_s'] else "")
+            for m in oof) + " |")
+    md += ["", "Cells: share of onsets with an alarm in the 30 s before (median lead time).", ""]
     md += ["", f"Deployed model: **{best}** (best cross-validated PR-AUC), alert threshold {thr:.3f}.", "",
            f"### Top features of the deployed model (permutation importance, PR-AUC drop on held-out burst runs)", "",
            "| Feature | Importance |", "|---|---|"] + [f"| `{f}` | {v} |" for f, v in results["permutation_importance_top15"]]

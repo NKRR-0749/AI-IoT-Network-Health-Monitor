@@ -1,4 +1,4 @@
-# ML results (2026-11-20 06:11)
+# ML results (2026-11-21 13:14)
 
 **Label: EMULATED (userspace impairment proxy); not real-hardware results.**
 
@@ -32,13 +32,13 @@ Rows: 13965, positives: 1498 (prevalence 0.107), degradation onsets: 365.
 
 | Model | pr_auc | roc_auc | precision | recall | f1 | early_warning_rate | median_lead_time_s | false_alarm_windows_per_device_hour |
 |---|---|---|---|---|---|---|---|---|
-| persistence | 0.482 | 0.575 | 0.585 | 0.33 | 0.422 | 0.338 | 30.0 | 70.4 |
-| threshold_rule | 0.47 | 0.579 | 0.577 | 0.331 | 0.421 | 0.348 | 30.0 | 72.9 |
-| logreg | 0.539 | 0.63 | 0.577 | 0.213 | 0.311 | 0.308 | 30.0 | 46.9 |
-| random_forest | 0.543 | 0.633 | 0.685 | 0.11 | 0.189 | 0.134 | 30.0 | 15.1 |
-| lightgbm | 0.528 | 0.638 | 0.634 | 0.128 | 0.213 | 0.184 | 30.0 | 22.2 |
+| persistence | 0.451 | 0.6 | 0.585 | 0.328 | 0.42 | 0.312 | 30.0 | 58.9 |
+| threshold_rule | 0.427 | 0.6 | 0.579 | 0.331 | 0.421 | 0.324 | 30.0 | 61.0 |
+| logreg | 0.511 | 0.633 | 0.588 | 0.203 | 0.302 | 0.315 | 30.0 | 35.9 |
+| random_forest | 0.524 | 0.667 | 0.734 | 0.124 | 0.213 | 0.162 | 30.0 | 11.4 |
+| lightgbm | 0.508 | 0.663 | 0.604 | 0.143 | 0.231 | 0.208 | 30.0 | 23.7 |
 
-Rows: 3240, positives: 1351 (prevalence 0.417), degradation onsets: 201.
+Rows: 6680, positives: 2348 (prevalence 0.351), degradation onsets: 346.
 
 ### PR-AUC by QoS (cross-validation)
 
@@ -50,24 +50,38 @@ Rows: 3240, positives: 1351 (prevalence 0.417), degradation onsets: 201.
 | random_forest | 0.39 (prev. 0.103) | 0.34 (prev. 0.111) |
 | lightgbm | 0.303 (prev. 0.103) | 0.257 (prev. 0.111) |
 
+### Early warning by onset kind (cross-validation): can it see a degradation coming?
+
+Each degradation onset is tagged with what the fault injector was doing when it started. Gradual (ramp) degradations build up over about a minute; sudden ones switch on at once.
+
+| Onset kind | onsets | persistence | threshold_rule | logreg | random_forest | lightgbm |
+|---|---|---|---|---|---|---|
+| gradual (ramp) | 88 | 0.034 (30 s) | 0.284 (10 s) | 0.136 (10 s) | 0.0 | 0.159 (28 s) |
+| sudden loss | 57 | 0.07 (20 s) | 0.281 (18 s) | 0.281 (20 s) | 0.158 (20 s) | 0.281 (15 s) |
+| sudden outage | 100 | 0.41 (30 s) | 0.43 (30 s) | 0.54 (30 s) | 0.41 (30 s) | 0.45 (30 s) |
+| sudden stall | 120 | 0.208 (25 s) | 0.383 (30 s) | 0.725 (15 s) | 0.575 (15 s) | 0.683 (25 s) |
+
+Cells: share of onsets with an alarm in the 30 s before (median lead time).
+
+
 Deployed model: **random_forest** (best cross-validated PR-AUC), alert threshold 0.670.
 
 ### Top features of the deployed model (permutation importance, PR-AUC drop on held-out burst runs)
 
 | Feature | Importance |
 |---|---|
-| `silence_s_now` | 0.011 |
-| `loss_revealed_mean6` | 0.0083 |
-| `connected_mean6` | 0.0073 |
-| `loss_revealed_max6` | 0.0071 |
-| `frac_over_ontime_max6` | 0.0059 |
-| `jitter_ms_max6` | 0.0054 |
-| `online_events_mean6` | 0.0053 |
-| `recv_ratio_slope6` | 0.0044 |
-| `jitter_ms_slope6` | 0.0041 |
-| `secs_since_offline` | 0.003 |
-| `connected_min6` | 0.0029 |
-| `udp_recv_ratio_mean6` | 0.0026 |
-| `jitter_ms_mean6` | 0.0022 |
-| `connected_now` | 0.002 |
-| `rtt_p95_ms_slope6` | 0.0019 |
+| `silence_s_now` | 0.019 |
+| `connected_mean6` | 0.0089 |
+| `connected_now` | 0.0061 |
+| `online_events_mean6` | 0.0057 |
+| `connected_min6` | 0.0056 |
+| `offline_events_max6` | 0.0052 |
+| `recv_ratio_slope6` | 0.0051 |
+| `secs_since_offline` | 0.0047 |
+| `udp_recv_ratio_now` | 0.0035 |
+| `loss_revealed_mean6` | 0.0033 |
+| `recv_ratio_now` | 0.0032 |
+| `udp_recv_ratio_slope6` | 0.003 |
+| `iat_std_ms_max6` | 0.0027 |
+| `delay_p95_ms_max6` | 0.0026 |
+| `offline_events_mean6` | 0.0022 |

@@ -37,13 +37,20 @@ def _slope(a: np.ndarray) -> float:
     return float(np.polyfit(x, a, 1)[0])
 
 
-def make_features(obs: pd.DataFrame, qos: int) -> pd.DataFrame:
-    """Turn observed windows (one device or many) into one feature row per window end."""
+# extra columns used only by the loss-PATTERN classifier (ml/patterns.py): the shape of the gaps
+PATTERN_BASE = ["gap_events", "gap_len_max", "gap_len_mean"]
+PATTERN_PROBE = ["udp_loss_revealed", "udp_gap_events", "udp_gap_len_max", "udp_gap_len_mean"]
+
+
+def make_features(obs: pd.DataFrame, qos: int, extra: list[str] | None = None) -> pd.DataFrame:
+    """Turn observed windows (one device or many) into one feature row per window end.
+    `extra` adds more observed-window columns (now / lag / rolling stats) on top of the standard set."""
+    cols = BASE + PROBE + list(extra or [])
     rows = []
     for dev, d in obs.sort_values("window_start").groupby("device_id"):
         d = d.reset_index(drop=True)
         f = {"device_id": pd.Series(dev, index=d.index), "window_start": d["window_start"]}
-        for c in BASE + PROBE:
+        for c in cols:
             s = d[c].astype(float) if c in d else pd.Series(np.nan, index=d.index)
             f[f"{c}_now"] = s
             f[f"{c}_lag1"] = s.shift(1)

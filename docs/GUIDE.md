@@ -328,13 +328,50 @@ was chosen on out-of-fold scores.
 
 **What the results say (emulated):** the models beat the baselines, but only modestly. On unseen bursty loss,
 ranking (PR-AUC) still beats persistence, but the threshold doesn't transfer well, so recall drops. UDP probe
-features added nothing over application-level features. Sudden outages can't be predicted from the past; gradual
-ramps can. See the README for the tables.
+features added nothing over application-level features.
+
+**Gradual vs sudden onsets.** `train.py` also tags every degradation onset with what the fault injector was doing
+when it began, and reports the early-warning rate per kind. The finding is uncomfortable but important: the
+deployed random forest warned **none** of the 88 gradual (ramp) onsets in cross-validation, even though delay
+visibly rises before them (for example 660 → 950 ms over 15 s). The simple threshold rule caught 28%. So the
+model mostly *reacts*; it does not yet *anticipate*. Its higher warning rates on "sudden" onsets come mainly from
+alarms still active after an earlier fault, not from prediction. Adding trend-projection features (delay + 6 ×
+slope) was tried and did not help. Treat "predict 30 s ahead" as an open problem in the report, not a result.
 
 **How to read the results honestly.** If a baseline does about as well as the
 model, report that. It's a finding, not a failure. The results here come from the
 userspace proxy, so they are a pipeline check, not paper results. Rerun with netem
 (and later real boards) before claiming anything.
+
+---
+
+## Block 9b: Loss-pattern analysis
+
+**Files:** `src/iotmon/ml/patterns.py`, gap features in `src/iotmon/windows.py`
+**Tests:** `tests/test_patterns.py`  **Status:** Implemented; results in `results/pattern_report.md` (**Emulated**)
+
+**Task.** For every 5 s window and device: which pattern is the link showing *now*?
+`clean`, `random_loss`, `bursty_loss`, `delay`, `stall` or `outage`. This is the "packet loss pattern analysis"
+in the project title.
+
+**Labels** come from the fault injector's ground truth: each window gets the phase that covers most of it
+(ramp phases count as their kind). **Features** are the degradation features plus the *shape* of the sequence
+gaps: number of gaps, mean and max gap length (= burst length), for MQTT messages and for UDP probes, with
+30 s and 60 s history. Bursty loss needs the 60 s history: a Gilbert–Elliott link is clean most of the time.
+
+**Why gap shape works.** The same 3 lost messages look different: random loss gives 3 gaps of length 1,
+bursty loss gives 1 gap of length 3 (`test_gap_features_separate_random_from_bursty`).
+
+**Evaluation:** GroupKFold by schedule seed over all 24 runs; baseline = a hand-written rule classifier;
+every model with and without UDP probe features; macro F1 (all classes count equally) and a confusion matrix.
+
+**Run:** `python -m iotmon.ml.patterns` → `results/pattern_report.md`, `results/pattern_results.json`,
+`models/pattern_model.joblib`
+
+**Results (emulated):** random forest macro F1 **0.83** (MQTT + UDP probes) and **0.79** (MQTT only), against
+0.55 and 0.37 for the rule baselines and 0.12 for always guessing `clean`. Outage, delay and random loss are
+recognised in over 90% of windows. Bursty loss (53%) and stall (59%) are the weak classes: bursty windows are
+often loss-free, and stalls are short (3–10 s), so many stall windows are only partly stalled.
 
 ---
 
@@ -348,8 +385,13 @@ userspace proxy, so they are a pipeline check, not paper results. Rerun with net
   The model only "clears" below half the threshold, so alerts don't flicker.
 
 `python -m iotmon.live` scores every active device every 5 s and writes
-`predictions` and `alerts`. `python -m iotmon.live --replay <run>` does the same
+`predictions`, `alerts` and `patterns` (the loss pattern of each window). It prints a line whenever an alert
+is raised or cleared, or a device's pattern changes. `python -m iotmon.live --replay <run>` does the same
 for a finished run, so the dashboard can show it.
+
+Live mode builds windows up to the current time, so a full outage (no messages at all) shows up as empty
+windows while it is happening, and it scores every window it has not scored yet. The last few seconds of a
+finished run (devices shutting down) are ignored.
 
 ---
 
@@ -362,7 +404,8 @@ for a finished run, so the dashboard can show it.
 | Fleet | a tile per device (health score, receive ratio, delay), fleet health over time |
 | Device | receive ratio, delay p95, RTT p95 and jitter over time; injected phases shaded |
 | Predictions & alerts | model risk score above the truth on-time ratio; the alert log |
-| Experiments | per-phase validation table, the ML report |
+| Loss patterns | the classifier's pattern per window next to the injected pattern (truth); time spent in each pattern |
+| Experiments | per-phase validation table, the ML report, the loss-pattern report |
 
 **Health score** = 100 × (25% delivery + 25% delay + 25% jitter + 25% connected).
 It's a summary for people to read, not a research result.
@@ -376,15 +419,18 @@ It's a summary for people to read, not a research result.
 | RQ1: how network loss/delay shows up in MQTT signals, QoS 0 vs 1 | `python -m iotmon.validate`, Block 8 |
 | RQ2: can a model forecast degradation and beat baselines | `results/ml_report.md`, cross-validation table |
 | RQ3: does it work on unseen conditions | `results/ml_report.md`, held-out burst table |
+| RQ4: can the loss pattern be recognised from MQTT-level signals | `results/pattern_report.md`, Block 9b |
 
 ## Reusing the experiment data
 
-`data/iot_monitor.dump` is the complete database behind the results (20 runs plus the pilot). Restore it with
+`data/iot_monitor.dump` is the complete database behind the results (24 runs plus the pilot): the 20 runs of
+`experiments/plan.yaml` and the 4 extra bursty runs of `experiments/plan_extra_burst.yaml`. Restore it with
 `pg_restore` (command in the README) to retrain or explore the dashboard without rerunning the experiments.
 
 ## What to do next
 1. Run everything once on your laptop (README quick start).
 2. Run the Wokwi firmware against your local broker.
 3. Set up WSL2 + netem and rerun `experiments/plan.yaml` with `--backend netem`. Those are the results worth writing up.
-4. Do the literature review (see the project plan) before claiming novelty.
-5. If you get ESP32 boards: run the firmware on real Wi-Fi as a validation (**Measured**).
+4. Use the literature review (related work in four areas, with a draft Related Work section) in the report.
+5. More burst-profile runs would strengthen the weakest pattern class (bursty loss).
+6. If you get ESP32 boards: run the firmware on real Wi-Fi as a validation (**Measured**).

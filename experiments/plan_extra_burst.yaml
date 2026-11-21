@@ -1,0 +1,12 @@
+# Extra bursty-loss runs (added after the first 20): gives the loss-pattern
+# classifier more than two schedule seeds with bursty loss, and RQ3 a bigger held-out set.
+# Same settings as plan.yaml.
+common:
+  devices: 10
+  interval_s: 0.5
+  duration_s: 420
+runs:
+  - {run_id: bur-s103-q0, profile: burst, seed: 103, qos: 0}
+  - {run_id: bur-s103-q1, profile: burst, seed: 103, qos: 1}
+  - {run_id: bur-s104-q0, profile: burst, seed: 104, qos: 0}
+  - {run_id: bur-s104-q1, profile: burst, seed: 104, qos: 1}

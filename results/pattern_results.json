@@ -1,0 +1,642 @@
+{
+  "generated": "2026-11-21 13:04",
+  "runs": [
+    "bur-s101-q0",
+    "bur-s101-q1",
+    "bur-s102-q0",
+    "bur-s102-q1",
+    "bur-s103-q0",
+    "bur-s103-q1",
+    "bur-s104-q0",
+    "bur-s104-q1",
+    "mix-s01-q0",
+    "mix-s01-q1",
+    "mix-s02-q0",
+    "mix-s02-q1",
+    "mix-s03-q0",
+    "mix-s03-q1",
+    "mix-s04-q0",
+    "mix-s04-q1",
+    "mix-s05-q0",
+    "mix-s05-q1",
+    "mix-s06-q0",
+    "mix-s06-q1",
+    "mix-s07-q0",
+    "mix-s07-q1",
+    "mix-s08-q0",
+    "mix-s08-q1"
+  ],
+  "n_rows": 21870,
+  "n_folds": 5,
+  "class_counts": {
+    "clean": 12140,
+    "random_loss": 3750,
+    "delay": 3420,
+    "bursty_loss": 1800,
+    "outage": 600,
+    "stall": 160
+  },
+  "majority_accuracy": 0.555,
+  "majority_macro_f1": 0.119,
+  "models": {
+    "rule baseline (UDP probes)": {
+      "macro_f1": 0.546,
+      "accuracy": 0.776,
+      "per_class": {
+        "clean": {
+          "precision": 0.807,
+          "recall": 0.923,
+          "f1": 0.861,
+          "n": 12140
+        },
+        "random_loss": {
+          "precision": 0.871,
+          "recall": 0.675,
+          "f1": 0.76,
+          "n": 3750
+        },
+        "bursty_loss": {
+          "precision": 0.183,
+          "recall": 0.057,
+          "f1": 0.087,
+          "n": 1800
+        },
+        "delay": {
+          "precision": 0.823,
+          "recall": 0.753,
+          "f1": 0.787,
+          "n": 3420
+        },
+        "stall": {
+          "precision": 0.084,
+          "recall": 0.219,
+          "f1": 0.122,
+          "n": 160
+        },
+        "outage": {
+          "precision": 0.531,
+          "recall": 0.867,
+          "f1": 0.658,
+          "n": 600
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "clean",
+          "random_loss",
+          "bursty_loss",
+          "delay",
+          "stall",
+          "outage"
+        ],
+        "rows_true_cols_pred": [
+          [
+            11201,
+            275,
+            205,
+            170,
+            106,
+            183
+          ],
+          [
+            782,
+            2530,
+            116,
+            254,
+            47,
+            21
+          ],
+          [
+            1135,
+            24,
+            102,
+            95,
+            213,
+            231
+          ],
+          [
+            768,
+            77,
+            0,
+            2575,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            77,
+            23,
+            35,
+            25
+          ],
+          [
+            0,
+            0,
+            56,
+            10,
+            14,
+            520
+          ]
+        ]
+      }
+    },
+    "rule baseline (MQTT only)": {
+      "macro_f1": 0.374,
+      "accuracy": 0.664,
+      "per_class": {
+        "clean": {
+          "precision": 0.75,
+          "recall": 0.93,
+          "f1": 0.83,
+          "n": 12140
+        },
+        "random_loss": {
+          "precision": 0.143,
+          "recall": 0.0,
+          "f1": 0.001,
+          "n": 3750
+        },
+        "bursty_loss": {
+          "precision": 0.147,
+          "recall": 0.012,
+          "f1": 0.022,
+          "n": 1800
+        },
+        "delay": {
+          "precision": 0.504,
+          "recall": 0.775,
+          "f1": 0.611,
+          "n": 3420
+        },
+        "stall": {
+          "precision": 0.084,
+          "recall": 0.219,
+          "f1": 0.122,
+          "n": 160
+        },
+        "outage": {
+          "precision": 0.531,
+          "recall": 0.867,
+          "f1": 0.658,
+          "n": 600
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "clean",
+          "random_loss",
+          "bursty_loss",
+          "delay",
+          "stall",
+          "outage"
+        ],
+        "rows_true_cols_pred": [
+          [
+            11292,
+            1,
+            90,
+            468,
+            106,
+            183
+          ],
+          [
+            1779,
+            1,
+            1,
+            1901,
+            47,
+            21
+          ],
+          [
+            1227,
+            5,
+            21,
+            103,
+            213,
+            231
+          ],
+          [
+            768,
+            0,
+            0,
+            2652,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            5,
+            95,
+            35,
+            25
+          ],
+          [
+            0,
+            0,
+            26,
+            40,
+            14,
+            520
+          ]
+        ]
+      }
+    },
+    "random_forest (MQTT + UDP probes)": {
+      "macro_f1": 0.832,
+      "accuracy": 0.897,
+      "per_class": {
+        "clean": {
+          "precision": 0.909,
+          "recall": 0.941,
+          "f1": 0.925,
+          "n": 12140
+        },
+        "random_loss": {
+          "precision": 0.889,
+          "recall": 0.906,
+          "f1": 0.897,
+          "n": 3750
+        },
+        "bursty_loss": {
+          "precision": 0.628,
+          "recall": 0.529,
+          "f1": 0.574,
+          "n": 1800
+        },
+        "delay": {
+          "precision": 0.973,
+          "recall": 0.932,
+          "f1": 0.952,
+          "n": 3420
+        },
+        "stall": {
+          "precision": 0.779,
+          "recall": 0.594,
+          "f1": 0.674,
+          "n": 160
+        },
+        "outage": {
+          "precision": 0.99,
+          "recall": 0.948,
+          "f1": 0.969,
+          "n": 600
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "clean",
+          "random_loss",
+          "bursty_loss",
+          "delay",
+          "stall",
+          "outage"
+        ],
+        "rows_true_cols_pred": [
+          [
+            11421,
+            250,
+            374,
+            78,
+            17,
+            0
+          ],
+          [
+            296,
+            3396,
+            49,
+            9,
+            0,
+            0
+          ],
+          [
+            767,
+            65,
+            952,
+            2,
+            10,
+            4
+          ],
+          [
+            46,
+            107,
+            78,
+            3189,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            62,
+            0,
+            95,
+            2
+          ],
+          [
+            31,
+            0,
+            0,
+            0,
+            0,
+            569
+          ]
+        ]
+      }
+    },
+    "random_forest (MQTT only)": {
+      "macro_f1": 0.786,
+      "accuracy": 0.874,
+      "per_class": {
+        "clean": {
+          "precision": 0.889,
+          "recall": 0.934,
+          "f1": 0.911,
+          "n": 12140
+        },
+        "random_loss": {
+          "precision": 0.843,
+          "recall": 0.877,
+          "f1": 0.86,
+          "n": 3750
+        },
+        "bursty_loss": {
+          "precision": 0.557,
+          "recall": 0.409,
+          "f1": 0.472,
+          "n": 1800
+        },
+        "delay": {
+          "precision": 0.975,
+          "recall": 0.91,
+          "f1": 0.941,
+          "n": 3420
+        },
+        "stall": {
+          "precision": 0.644,
+          "recall": 0.531,
+          "f1": 0.582,
+          "n": 160
+        },
+        "outage": {
+          "precision": 0.977,
+          "recall": 0.927,
+          "f1": 0.951,
+          "n": 600
+        }
+      },
+      "confusion_matrix": {
+        "labels": [
+          "clean",
+          "random_loss",
+          "bursty_loss",
+          "delay",
+          "stall",
+          "outage"
+        ],
+        "rows_true_cols_pred": [
+          [
+            11333,
+            270,
+            440,
+            80,
+            14,
+            3
+          ],
+          [
+            401,
+            3290,
+            54,
+            0,
+            5,
+            0
+          ],
+          [
+            917,
+            108,
+            737,
+            0,
+            28,
+            10
+          ],
+          [
+            55,
+            234,
+            20,
+            3111,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            72,
+            0,
+            85,
+            0
+          ],
+          [
+            44,
+            0,
+            0,
+            0,
+            0,
+            556
+          ]
+        ]
+      }
+    }
+  },
+  "slices": {
+    "qos0": {
+      "rule baseline (UDP probes)": 0.553,
+      "rule baseline (MQTT only)": 0.381,
+      "random_forest (MQTT + UDP probes)": 0.828,
+      "random_forest (MQTT only)": 0.788,
+      "n": 10940
+    },
+    "qos1": {
+      "rule baseline (UDP probes)": 0.539,
+      "rule baseline (MQTT only)": 0.366,
+      "random_forest (MQTT + UDP probes)": 0.836,
+      "random_forest (MQTT only)": 0.785,
+      "n": 10930
+    },
+    "pure_windows (one phase covers the whole window)": {
+      "rule baseline (UDP probes)": 0.578,
+      "rule baseline (MQTT only)": 0.407,
+      "random_forest (MQTT + UDP probes)": 0.738,
+      "random_forest (MQTT only)": 0.707,
+      "n": 16680
+    },
+    "transition_windows": {
+      "rule baseline (UDP probes)": 0.459,
+      "rule baseline (MQTT only)": 0.286,
+      "random_forest (MQTT + UDP probes)": 0.793,
+      "random_forest (MQTT only)": 0.752,
+      "n": 5190
+    }
+  },
+  "recall_by_intensity": {
+    "random_loss": {
+      "1": {
+        "n": 240,
+        "recall": 0.217
+      },
+      "5": {
+        "n": 360,
+        "recall": 0.742
+      },
+      "10": {
+        "n": 1020,
+        "recall": 0.947
+      },
+      "15": {
+        "n": 350,
+        "recall": 1.0
+      },
+      "20": {
+        "n": 370,
+        "recall": 0.997
+      },
+      "25": {
+        "n": 410,
+        "recall": 1.0
+      },
+      "30": {
+        "n": 1000,
+        "recall": 0.982
+      }
+    },
+    "bursty_loss": {
+      "1": {
+        "n": 140,
+        "recall": 0.043
+      },
+      "5": {
+        "n": 580,
+        "recall": 0.445
+      },
+      "10": {
+        "n": 140,
+        "recall": 0.529
+      },
+      "15": {
+        "n": 120,
+        "recall": 0.7
+      },
+      "20": {
+        "n": 260,
+        "recall": 0.627
+      },
+      "25": {
+        "n": 120,
+        "recall": 0.733
+      },
+      "30": {
+        "n": 440,
+        "recall": 0.634
+      }
+    },
+    "delay": {
+      "100": {
+        "n": 460,
+        "recall": 0.954
+      },
+      "133": {
+        "n": 390,
+        "recall": 0.895
+      },
+      "267": {
+        "n": 390,
+        "recall": 1.0
+      },
+      "300": {
+        "n": 440,
+        "recall": 1.0
+      },
+      "400": {
+        "n": 330,
+        "recall": 1.0
+      },
+      "533": {
+        "n": 370,
+        "recall": 1.0
+      },
+      "600": {
+        "n": 160,
+        "recall": 0.906
+      },
+      "667": {
+        "n": 350,
+        "recall": 1.0
+      },
+      "800": {
+        "n": 350,
+        "recall": 0.966
+      },
+      "1200": {
+        "n": 180,
+        "recall": 0.211
+      }
+    }
+  },
+  "top_features": [
+    [
+      "udp_recv_ratio_now",
+      0.0477
+    ],
+    [
+      "connected_mean6",
+      0.033
+    ],
+    [
+      "udp_recv_ratio_slope6",
+      0.0323
+    ],
+    [
+      "secs_since_offline",
+      0.0317
+    ],
+    [
+      "connected_now",
+      0.0293
+    ],
+    [
+      "rtt_mean_ms_now",
+      0.0291
+    ],
+    [
+      "connected_min6",
+      0.025
+    ],
+    [
+      "udp_recv_ratio_min6",
+      0.0246
+    ],
+    [
+      "rtt_p95_ms_now",
+      0.0235
+    ],
+    [
+      "delay_max_ms_now",
+      0.0234
+    ],
+    [
+      "delay_mean_ms_now",
+      0.0224
+    ],
+    [
+      "delay_p95_ms_now",
+      0.0224
+    ]
+  ],
+  "bursty_observability": {
+    "bursty_windows": 1800,
+    "share_with_udp_loss_in_window": 0.212,
+    "share_with_udp_loss_in_last_60s": 0.634,
+    "recall_all": 0.529,
+    "recall_when_loss_seen_in_last_60s": 0.546
+  }
+}

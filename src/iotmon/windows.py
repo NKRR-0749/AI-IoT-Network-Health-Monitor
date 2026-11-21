@@ -134,6 +134,11 @@ def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None,
             g = m.groupby("w")
             frame["n_received"] = g.size()
             frame["missing_revealed"] = g["missing_revealed"].sum()
+            # loss PATTERN: each arrival after a hole reveals one gap; its size = the burst length
+            gaps = m["missing_revealed"].where(m["missing_revealed"] > 0)
+            frame["gap_events"] = gaps.groupby(m["w"]).count()
+            frame["gap_len_max"] = gaps.groupby(m["w"]).max()
+            frame["gap_len_mean"] = gaps.groupby(m["w"]).mean()
             frame["late_arrivals"] = g["late"].sum()
             frame["delay_mean_ms"] = g["rel_delay_ms"].mean()
             frame["delay_p95_ms"] = g["rel_delay_ms"].quantile(0.95)
@@ -144,7 +149,7 @@ def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None,
             frame["iat_max_ms"] = g["iat_ms"].max()
             frame["jitter_ms"] = g["jitter_ms"].last()
             frame["last_rx_ts"] = g["ts"].max()
-        for c in ("n_received", "missing_revealed", "late_arrivals"):
+        for c in ("n_received", "missing_revealed", "late_arrivals", "gap_events", "gap_len_max", "gap_len_mean"):
             frame[c] = frame.get(c, pd.Series(dtype=float)).reindex(idx).fillna(0)
         frame["jitter_ms"] = frame.get("jitter_ms", pd.Series(dtype=float)).reindex(idx).ffill()
         last_rx = frame.get("last_rx_ts", pd.Series(dtype=float)).reindex(idx).ffill()
@@ -179,9 +184,15 @@ def observed_windows(data: dict, window_s: int = None, ontime_ms: float = None,
             g = u.groupby("w")
             frame["udp_received"] = g.size()
             frame["udp_missing_revealed"] = g["missing_revealed"].sum()
-        for c in ("udp_received", "udp_missing_revealed"):
+            ugaps = u["missing_revealed"].where(u["missing_revealed"] > 0)
+            frame["udp_gap_events"] = ugaps.groupby(u["w"]).count()
+            frame["udp_gap_len_max"] = ugaps.groupby(u["w"]).max()
+            frame["udp_gap_len_mean"] = ugaps.groupby(u["w"]).mean()
+        for c in ("udp_received", "udp_missing_revealed", "udp_gap_events", "udp_gap_len_max", "udp_gap_len_mean"):
             frame[c] = frame.get(c, pd.Series(dtype=float)).reindex(idx).fillna(0)
         frame["udp_recv_ratio"] = frame["udp_received"] / (window_s / probe_iv)
+        useen = frame["udp_received"] + frame["udp_missing_revealed"]
+        frame["udp_loss_revealed"] = np.where(useen > 0, frame["udp_missing_revealed"] / useen.replace(0, np.nan), np.nan)
 
         # connection events
         e = events[events["device_id"] == dev].sort_values("ts")

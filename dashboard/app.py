@@ -6,7 +6,9 @@ Tabs
   Fleet        one tile per device: health score, delivery, delay, alerts
   Device       recv ratio, delay p95, RTT p95, jitter over time (+ injected phases, experiments only)
   Predictions  the model's risk score next to what actually happened (truth), plus the alert log
-  Experiments  testbed validation for the selected run and the ML report
+  Loss patterns  what kind of trouble each device is in (clean / random / bursty / delay / stall / outage),
+               next to what the fault injector actually did
+  Experiments  testbed validation for the selected run and the ML reports
 """
 import math
 import os
@@ -23,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from iotmon import db  # noqa: E402
 from iotmon.config import ROOT, settings  # noqa: E402
 from iotmon.metrics import health_score  # noqa: E402
+from iotmon.ml.patterns import PATTERNS, phase_pattern  # noqa: E402
 from iotmon.validate import phase_table  # noqa: E402
 from iotmon.windows import _query, load_run, observed_windows  # noqa: E402
 
@@ -30,6 +33,10 @@ st.set_page_config(page_title="IoT Network Health Monitor", layout="wide")
 W = settings.window_s
 BLUE, RED, INK2 = "#2a78d6", "#e34948", "#52514e"
 PHASE_FILL = "rgba(127,127,127,0.13)"
+PATTERN_COLOR = {"clean": "#c9c7c1", "random_loss": "#e8a33d", "bursty_loss": "#e34948", "delay": "#2a78d6",
+                 "stall": "#8a5cc7", "outage": "#1f1e1c"}
+PATTERN_LABEL = {"clean": "clean", "random_loss": "random loss", "bursty_loss": "bursty loss", "delay": "delay",
+                 "stall": "stall", "outage": "outage"}
 
 
 # ------------------------------------------------------------------ data
@@ -76,6 +83,12 @@ def predictions(run_id: str) -> pd.DataFrame:
 
 
 @st.cache_data(ttl=4)
+def patterns(run_id: str) -> pd.DataFrame:
+    return _query(conn(), "SELECT device_id, at, pattern, confidence, model FROM patterns WHERE run_id=%s"
+                          " ORDER BY at", [run_id])
+
+
+@st.cache_data(ttl=4)
 def alerts(run_id: str) -> pd.DataFrame:
     return _query(conn(), "SELECT device_id, source, severity, raised_at, cleared_at, reason FROM alerts"
                           " WHERE run_id=%s ORDER BY raised_at DESC", [run_id])
@@ -110,6 +123,43 @@ def device_chart(d: pd.DataFrame, ph: pd.DataFrame):
                                  connectgaps=False), row=i, col=1)
     shade_phases(fig, ph, len(panels))
     return style(fig, 760)
+
+
+def injected_pattern(times: pd.Series, ph: pd.DataFrame) -> list:
+    """Ground-truth pattern (from the injected phase) at the middle of each window that ends at `times`."""
+    if ph.empty:
+        return [None] * len(times)
+    st_, en = pd.to_datetime(ph["start_at"], utc=True), pd.to_datetime(ph["end_at"], utc=True)
+    pats = [phase_pattern(a, b) for a, b in zip(ph["phase"], ph["params"])]
+    out = []
+    for t in pd.to_datetime(times, utc=True) - pd.Timedelta(seconds=W / 2):
+        hit = [p for p, a, b in zip(pats, st_, en) if a <= t < b]
+        out.append(hit[0] if hit else None)
+    return out
+
+
+def pattern_chart(pp: pd.DataFrame, ph: pd.DataFrame):
+    rows = [("Classifier", pp["pattern"].tolist())]
+    truth_pat = injected_pattern(pp["at"], ph)
+    if any(truth_pat):
+        rows.append(("Injected (truth)", truth_pat))
+    fig = go.Figure()
+    for pat in PATTERNS:
+        for name, vals in rows:
+            mask = [v == pat for v in vals]
+            if not any(mask):
+                continue
+            fig.add_trace(go.Scatter(x=pp["at"][mask], y=[name] * sum(mask), mode="markers",
+                                     marker=dict(symbol="square", size=11, color=PATTERN_COLOR[pat]),
+                                     name=PATTERN_LABEL[pat], legendgroup=pat,
+                                     showlegend=name == "Classifier" or pat not in set(rows[0][1]),
+                                     customdata=pp["confidence"][mask] if name == "Classifier" else None,
+                                     hovertemplate=(f"{PATTERN_LABEL[pat]}" + (" (%{customdata:.0%})" if name == "Classifier"
+                                                                                else "") + "<extra></extra>")))
+    fig = style(fig, 220)
+    fig.update_layout(showlegend=True, legend=dict(orientation="h", y=-0.35), hovermode="closest")
+    fig.update_yaxes(categoryorder="array", categoryarray=[n for n, _ in rows][::-1], showgrid=False)
+    return fig
 
 
 def prediction_chart(p: pd.DataFrame, t: pd.DataFrame, thr: float | None, ph: pd.DataFrame):
@@ -158,7 +208,10 @@ if obs.empty:
     st.stop()
 ph = phases(run_id)
 devs = sorted(obs["device_id"].unique())
-tab_fleet, tab_dev, tab_pred, tab_exp = st.tabs(["Fleet", "Device", "Predictions & alerts", "Experiments"])
+tab_fleet, tab_dev, tab_pred, tab_pat, tab_exp = st.tabs(["Fleet", "Device", "Predictions & alerts", "Loss patterns",
+                                                          "Experiments"])
+pats_all = patterns(run_id)
+latest_pat = pats_all.groupby("device_id").tail(1).set_index("device_id") if not pats_all.empty else pats_all
 
 with tab_fleet:
     last_complete = obs[obs["window_start"] + W <= (time.time() - 1 if live else obs["window_start"].max() - W)]
@@ -177,6 +230,9 @@ with tab_fleet:
                       help="Health score: 25% delivery, 25% delay, 25% jitter, 25% connected")
             dp = x["delay_p95_ms"]
             st.caption(f"recv {x['recv_ratio']:.2f} · delay p95 {'–' if math.isnan(dp) else f'{dp:.0f} ms'}")
+            if not latest_pat.empty and dev in latest_pat.index:
+                lp = latest_pat.loc[dev]
+                st.caption(f"pattern: **{PATTERN_LABEL.get(lp['pattern'], lp['pattern'])}** ({lp['confidence']:.0%})")
     st.subheader("Fleet health over time")
     fleet = obs.groupby("time")["health"].agg(["mean", "min"]).reset_index()
     fig = go.Figure([go.Scatter(x=fleet["time"], y=fleet["mean"], mode="lines", line=dict(color=BLUE, width=2),
@@ -217,6 +273,24 @@ with tab_pred:
     al = alerts(run_id)
     st.dataframe(al, width="stretch", hide_index=True) if not al.empty else st.caption("No alerts.")
 
+with tab_pat:
+    if pats_all.empty:
+        st.info("No loss patterns for this run. Live runs: start `python -m iotmon.live`. "
+                "Finished runs: `python -m iotmon.live --replay " + run_id + "`.")
+    else:
+        st.caption("Every 5 s the pattern classifier names the kind of trouble each device is in. "
+                   "On experiment runs, the second row shows what the fault injector really did. "
+                   "Runs used for training show optimistic (in-sample) results; see the cross-validated report "
+                   "in the Experiments tab.")
+        dev3 = st.selectbox("Device  ", devs, key="patdev")
+        pp = pats_all[pats_all["device_id"] == dev3].reset_index(drop=True)
+        st.plotly_chart(pattern_chart(pp, ph), width="stretch")
+        st.subheader("Time spent in each pattern (all devices)")
+        share = (pats_all.groupby(["device_id", "pattern"]).size().unstack(fill_value=0)
+                 .reindex(columns=[p for p in PATTERNS if p in set(pats_all["pattern"])]))
+        share = (share.div(share.sum(axis=1), axis=0) * 100).round(0).astype(int)
+        st.dataframe(share.rename(columns=PATTERN_LABEL).astype(str) + " %", width="stretch")
+
 with tab_exp:
     if not ph.empty:
         st.subheader("Testbed validation: injected vs measured, per phase")
@@ -226,6 +300,11 @@ with tab_exp:
         st.markdown(report.read_text())
     else:
         st.caption("No ML report yet: run `python -m iotmon.ml.train`.")
+    preport = ROOT / "results" / "pattern_report.md"
+    if preport.exists():
+        st.markdown(preport.read_text())
+    else:
+        st.caption("No loss-pattern report yet: run `python -m iotmon.ml.patterns`.")
 
 if auto:
     time.sleep(5)

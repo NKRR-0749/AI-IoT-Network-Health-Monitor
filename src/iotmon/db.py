@@ -12,7 +12,7 @@ from psycopg.types.json import Jsonb
 from .config import ROOT, settings
 
 SCHEMA_FILE = ROOT / "db" / "schema.sql"
-TABLES = ["alerts", "predictions", "windows", "impairments", "connection_events",
+TABLES = ["patterns", "alerts", "predictions", "windows", "impairments", "connection_events",
           "udp_probes", "rtt_probes", "messages", "devices", "runs"]
 
 

@@ -124,3 +124,15 @@ CREATE TABLE IF NOT EXISTS alerts (
     reason     TEXT NOT NULL,
     source     TEXT NOT NULL CHECK (source IN ('rule', 'model'))
 );
+
+-- Loss pattern of each device per 5 s window (ml/patterns.py classifier, written by live.py)
+CREATE TABLE IF NOT EXISTS patterns (
+    id         BIGSERIAL PRIMARY KEY,
+    run_id     TEXT NOT NULL,
+    device_id  TEXT NOT NULL,
+    at         TIMESTAMPTZ NOT NULL,                -- end of the window
+    pattern    TEXT NOT NULL,                       -- clean / random_loss / bursty_loss / delay / stall / outage
+    confidence DOUBLE PRECISION NOT NULL,           -- classifier probability of that pattern
+    model      TEXT NOT NULL                        -- 'with_probe' or 'mqtt_only'
+);
+CREATE INDEX IF NOT EXISTS patterns_dev_time ON patterns (run_id, device_id, at);
