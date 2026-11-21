@@ -271,7 +271,10 @@ with tab_pred:
         st.plotly_chart(prediction_chart(p, t, thr, ph), width="stretch")
     st.subheader("Alerts")
     al = alerts(run_id)
-    st.dataframe(al, width="stretch", hide_index=True) if not al.empty else st.caption("No alerts.")
+    if al.empty:
+        st.caption("No alerts.")
+    else:
+        st.dataframe(al, width="stretch", hide_index=True)
 
 with tab_pat:
     if pats_all.empty:
